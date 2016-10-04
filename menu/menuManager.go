@@ -11,6 +11,7 @@ const (
 // MenuManager is a struct which manage menu
 type MenuManager struct {
 	window *gc.Window
+	my, mx int      // max height and width of terminal
 	y, x   int      // current windows position on terminal
 	titles []string // titles of menu
 	active int      // curent active menu item
@@ -36,11 +37,11 @@ func (m *MenuManager) init() error {
 	gc.MouseInterval(50)
 	gc.MouseMask(gc.M_ALL, nil) // detect all mouse clicks
 
-	my, mx := stdscr.MaxYX()
+	m.my, m.mx = stdscr.MaxYX()
 
 	m.titles = []string{"Play", "Levels", "Exit"}
 
-	m.y, m.x = (my/2)-(HEIGHT/2), (mx/2)-(WIDTH/2)
+	m.y, m.x = (m.my/2)-(HEIGHT/2), (m.mx/2)-(WIDTH/2)
 
 	m.window, err = gc.NewWindow(HEIGHT, WIDTH, m.y, m.x)
 
@@ -64,9 +65,9 @@ func (m *MenuManager) printMenu() {
 	}
 }
 
-func (m *MenuManager) getActive(my, mx int) int {
-	row := my - m.y - MARGIN
-	col := mx - m.x - MARGIN
+func (m *MenuManager) getActive() int {
+	row := m.my - m.y - MARGIN
+	col := m.mx - m.x - MARGIN
 
 	if row < 0 || row > len(m.titles)-1 {
 		return -1
@@ -97,7 +98,7 @@ func (m *MenuManager) handleInput(key gc.Key) bool {
 	case gc.KEY_MOUSE:
 		/* pull the mouse event off the queue */
 		if md := gc.GetMouse(); md != nil {
-			new := m.getActive(md.Y, md.X)
+			new := m.getActive()
 			if new != -1 {
 				m.active = new
 			}
@@ -111,8 +112,9 @@ func (m *MenuManager) handleInput(key gc.Key) bool {
 
 func (m *MenuManager) refresh() {
 	gc.StdScr().Clear()
-	gc.StdScr().Refresh()
+	m.window.Clear()
 	m.window.Refresh()
+	gc.StdScr().Refresh()
 }
 
 func (m *MenuManager) Run(game *Game) error {
@@ -133,7 +135,7 @@ func (m *MenuManager) Run(game *Game) error {
 			switch m.active {
 			case 0:
 				(*game).Play()
-			case 2: // exit
+			case 3: // exit
 				return nil
 			}
 		}
