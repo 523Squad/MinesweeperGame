@@ -1,8 +1,9 @@
 package main
 
 import (
-	. "github.com/rthornton128/goncurses"
 	"log"
+
+	. "github.com/rthornton128/goncurses"
 )
 
 const (
