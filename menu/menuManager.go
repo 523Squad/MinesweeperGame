@@ -24,7 +24,11 @@ type Manager struct {
 // Game interface which describe game that should run
 // if user choose appropriate option
 type Game interface {
-	Play(int)
+	// Play starts main part of the game.
+	Play(level int)
+
+	// Reset resets the game.
+	Reset()
 }
 
 // Init standart ncurses screen
@@ -166,6 +170,7 @@ func (m *Manager) Run(game Game) error {
 			switch m.active {
 			case 0:
 				game.Play(m.mode)
+				game.Reset()
 			case 2: // exit
 				return nil
 			}

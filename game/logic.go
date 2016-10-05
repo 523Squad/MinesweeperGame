@@ -143,9 +143,8 @@ func (b *Board) isWin() bool {
 	return true
 }
 
-// continue tells whether we should keep playing.
+// continuePlaying tells whether we should keep playing.
 func (b *Board) continuePlaying() bool {
-	// Stub. TODO: Implement
 	return !b.gameOver
 }
 
@@ -196,6 +195,12 @@ func (b *Board) initGame(mode int) {
 	b.bombsNumber = bombsNumber
 	b.setBoard()
 	fmt.Println(strconv.FormatBool(b.gameOver))
+}
+
+func (b *Board) resetGame() {
+	b.field = [][]*point{}
+	b.gameWin = false
+	b.gameOver = false
 }
 
 //func main() {

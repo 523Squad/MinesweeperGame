@@ -9,8 +9,8 @@ import (
 const (
 	cellScaleX = 3
 	cellScaleY = 2
-	winWidth   = 50
-	winHeight  = 30
+	winWidth   = 80
+	winHeight  = 40
 )
 
 type gameContract interface {
@@ -43,6 +43,12 @@ func (board *Board) Play(level int) {
 		},
 	}
 	play(state)
+	state.win.Delete()
+}
+
+// Reset resets board state.
+func (board *Board) Reset() {
+	board.resetGame()
 }
 
 func initScreen() (*gc.Window, error) {
@@ -71,13 +77,19 @@ func initScreen() (*gc.Window, error) {
 }
 
 func play(state *viewState) {
+	state.draw()
 	for state.board.continuePlaying() {
-		state.draw()
 		if state.handleKey() {
 			break
 		}
+		state.draw()
 	}
-	state.board = &Board{}
+	if state.board.gameWin {
+		state.drawWin()
+	}
+	if state.board.gameOver {
+		state.drawLoss()
+	}
 }
 
 func (state *viewState) draw() {
@@ -86,7 +98,7 @@ func (state *viewState) draw() {
 	win.Box(0, 0)
 	my, mx := win.MaxYX()
 	board := state.board
-	height, width := len(board.field), len(board.field[0])
+	height, width := state.board.dimension, state.board.dimension
 	for i, row := range board.field {
 		for j, value := range row {
 			pos := &coordinate{x: j, y: i}
@@ -99,6 +111,35 @@ func (state *viewState) draw() {
 		}
 	}
 	win.Refresh()
+}
+
+func (state *viewState) drawLoss() {
+	state.draw()
+	win := state.win
+	my, mx := win.MaxYX()
+	x, y := mx/2-6, (my-state.board.dimension*cellScaleY)/2-2
+	win.Move(y, x)
+	win.Printf("GAME OVER")
+	state.waitForExit()
+}
+
+func (state *viewState) drawWin() {
+	state.draw()
+	win := state.win
+	my, mx := win.MaxYX()
+	x, y := mx/2-4, (my-state.board.dimension*cellScaleY)/2-2
+	win.Move(y, x)
+	win.Printf("YOU WON")
+	state.waitForExit()
+}
+
+func (state *viewState) waitForExit() {
+	for {
+		switch state.win.GetChar() {
+		case 'q', gc.KEY_RETURN, gc.KEY_ENTER, gc.Key('\r'):
+			return
+		}
+	}
 }
 
 func (state *viewState) handleKey() bool {
