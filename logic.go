@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"strconv"
 	"math/rand"
+	"strconv"
 )
 
 const EASY_LVL_DIM = 9
@@ -14,20 +14,20 @@ const HARD_LVL_DIM = 30
 const HARD_LVL_BOMBS = 116
 
 type Point struct {
-	touched bool
-	isBomb bool
+	touched     bool
+	isBomb      bool
 	bombsNumber int
 }
 
 type Board struct {
 	bombsNumber int
-	dimension int
-	field [][]*Point
-	gameOver bool
+	dimension   int
+	field       [][]*Point
+	gameOver    bool
 }
 
-func (p *Point) toString() string{
-	return " " +  strconv.FormatBool(p.isBomb)
+func (p *Point) toString() string {
+	return " " + strconv.FormatBool(p.isBomb)
 }
 
 func (b *Board) setBoard(n int) {
@@ -44,9 +44,11 @@ func (b *Board) setBoard(n int) {
 func (b *Board) setBombs() {
 	count := b.bombsNumber
 	for count > 0 {
-		if (b.field[rand.Intn(b.dimension)][rand.Intn(b.dimension)].isBomb == false) {
-			b.field[rand.Intn(b.dimension)][rand.Intn(b.dimension)].isBomb = true
-			count -= 1
+		x := rand.Intn(b.dimension)
+		y := rand.Intn(b.dimension)
+		if b.field[x][y].isBomb == false {
+			b.field[x][y].isBomb = true
+			count--
 		}
 	}
 	//c := 0
@@ -66,8 +68,8 @@ func (b *Board) setBombs() {
 
 func main() {
 	p := Board{
-		dimension:EASY_LVL_DIM,
-		bombsNumber:EASY_LVL_BOMBS,
+		dimension:   EASY_LVL_DIM,
+		bombsNumber: EASY_LVL_BOMBS,
 	}
 	p.setBoard(p.dimension)
 	fmt.Println(strconv.FormatBool(p.gameOver))
