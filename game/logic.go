@@ -27,6 +27,7 @@ type point struct {
 // Board represents minesweeper board.
 type Board struct {
 	bombsNumber int
+	flagsLeft   int
 	dimension   int
 	field       [][]*point
 	gameOver    bool
@@ -231,6 +232,7 @@ func (b *Board) initGame(mode int) {
 	}
 	b.dimension = dimension
 	b.bombsNumber = bombsNumber
+	b.flagsLeft = bombsNumber
 	b.setBoard()
 	fmt.Println(strconv.FormatBool(b.gameOver))
 }
