@@ -1,68 +1,32 @@
 package game
 
-import (
-	"log"
+import gc "github.com/rthornton128/goncurses"
 
-	gc "github.com/rthornton128/goncurses"
-)
-
-const (
-	NOT_VISITED = -1
-	MINE        = -2
-	PLAYER      = -3
-)
-
-type State struct {
-	Field [][]int
-}
-
-type MineSweeper interface {
-	// Tells whether we should continue the game.
-	Continue() bool
-}
-
-func (g *State) Play() {
-	if !initScreen() {
-		return
-	}
-	defer gc.End()
-
+// Play starts main part of the game.
+func (g *Board) Play() {
+	initScreen()
+	g.initGame()
 	play(g)
 }
 
-func initScreen() bool {
-	stdscr, err := gc.Init()
-	stdscr.Timeout(100)
-	if err != nil {
-		return false
-	}
-	if err := gc.StartColor(); err != nil {
-		log.Fatal(err)
-	}
-	gc.Raw(true)
-	gc.Echo(false)
-	gc.Cursor(0)
+func initScreen() {
+	stdscr := gc.StdScr()
 
-	gc.InitPair(1, gc.C_BLACK, gc.C_CYAN)
-	gc.InitPair(2, gc.C_BLACK, gc.C_MAGENTA)
-	gc.InitPair(3, gc.C_BLACK, gc.C_GREEN)
+	gc.InitPair(1, gc.C_BLACK, gc.C_WHITE)
+	gc.InitPair(2, gc.C_BLACK, gc.C_CYAN)
+	gc.InitPair(3, gc.C_BLACK, gc.C_MAGENTA)
+	gc.InitPair(4, gc.C_BLACK, gc.C_GREEN)
 
 	stdscr.Clear()
-	stdscr.Keypad(true)
-	return true
 }
 
-func play(s *State) {
-	if _, ok := s.(menu.Game); !ok {
-		return
-	}
-	s = s.(menu.Game)
+func play(board *Board) {
 	stdscr := gc.StdScr()
 	my, mx := stdscr.MaxYX()
-	for s.Continue() {
+	for board.continuePlaying() {
 		stdscr.Clear()
-		height, width := len(s.Field), len(s.Field[0])
-		for i, row := range s.Field {
+		height, width := len(board.field), len(board.field[0])
+		for i, row := range board.field {
 			for j, value := range row {
 				cnum := whichColor(value)
 				stdscr.ColorOn(cnum)
@@ -75,26 +39,22 @@ func play(s *State) {
 	}
 }
 
-func whichColor(value int) int16 {
-	switch value {
-	case NOT_VISITED:
-		return 0
-	case PLAYER:
+func whichColor(value *point) int16 {
+	if !value.touched && !value.isBomb {
 		return 1
-	case MINE:
-		return 2
 	}
-	return 3
+	if value.isBomb {
+		return 3
+	}
+	return 4
 }
 
-func whichChar(value int) rune {
-	switch value {
-	case NOT_VISITED:
+func whichChar(value *point) rune {
+	if !value.touched && !value.isBomb {
 		return '█'
-	case PLAYER:
-		return 'Ϙ'
-	case MINE:
+	}
+	if value.isBomb {
 		return '💣'
 	}
-	return rune(value)
+	return rune(value.bombsNumber)
 }

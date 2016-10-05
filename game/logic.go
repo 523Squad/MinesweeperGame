@@ -1,4 +1,4 @@
-package main
+package game
 
 import (
 	"fmt"
@@ -6,6 +6,8 @@ import (
 	"strconv"
 )
 
+// TODO: Rename constants.
+// see: https://stackoverflow.com/questions/22688906/go-naming-conventions-for-const
 const EASY_LVL_DIM = 9
 const EASY_LVL_BOMBS = 10
 const MIDDLE_LVL_DIM = 16
@@ -13,28 +15,29 @@ const MIDDLE_LVL_BOMBS = 40
 const HARD_LVL_DIM = 30
 const HARD_LVL_BOMBS = 116
 
-type Point struct {
+type point struct {
 	touched     bool
 	isBomb      bool
 	bombsNumber int
 }
 
+// Board represents minesweeper board.
 type Board struct {
 	bombsNumber int
 	dimension   int
-	field       [][]*Point
+	field       [][]*point
 	gameOver    bool
 }
 
-func (p *Point) toString() string {
+func (p *point) toString() string {
 	return " " + strconv.FormatBool(p.isBomb)
 }
 
 func (b *Board) setBoard(n int) {
 	for i := 0; i < n; i++ {
-		row := []*Point{}
+		row := []*point{}
 		for j := 0; j < n; j++ {
-			row = append(row, new(Point))
+			row = append(row, new(point))
 		}
 		b.field = append(b.field, row)
 	}
@@ -66,12 +69,16 @@ func (b *Board) setBombs() {
 	//}
 }
 
-func main() {
-	p := Board{
-		dimension:   EASY_LVL_DIM,
-		bombsNumber: EASY_LVL_BOMBS,
-	}
-	p.setBoard(p.dimension)
-	fmt.Println(strconv.FormatBool(p.gameOver))
+// continue tells whether we should keep playing.
+func (b *Board) continuePlaying() bool {
+	// Stub. TODO: Implement
+	return true
+}
+
+func (b *Board) initGame() {
+	b.dimension = EASY_LVL_DIM
+	b.bombsNumber = EASY_LVL_BOMBS
+	b.setBoard(b.dimension)
+	fmt.Println(strconv.FormatBool(b.gameOver))
 
 }
