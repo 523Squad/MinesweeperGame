@@ -25,6 +25,7 @@ type viewState struct {
 	win      *gc.Window
 	board    *Board
 	position *coordinate
+	elapsed  int
 }
 
 // Play starts main part of the game.
@@ -73,6 +74,7 @@ func initScreen() (*gc.Window, error) {
 		return nil, err
 	}
 	win.Keypad(true)
+	win.Timeout(1000)
 	return win, nil
 }
 
@@ -83,6 +85,7 @@ func play(state *viewState) {
 			break
 		}
 		state.draw()
+		state.elapsed++
 	}
 	if state.board.gameWin {
 		state.drawWin()
@@ -110,6 +113,10 @@ func (state *viewState) draw() {
 			win.ColorOff(cnum)
 		}
 	}
+	// Draw time elapsed
+	x, y := (mx-width*cellScaleX)/2, (my-height*cellScaleY)/2-2
+	win.Move(y, x)
+	win.Printf("%03d", state.elapsed)
 	win.Refresh()
 }
 
@@ -117,7 +124,7 @@ func (state *viewState) drawLoss() {
 	state.draw()
 	win := state.win
 	my, mx := win.MaxYX()
-	x, y := mx/2-6, (my-state.board.dimension*cellScaleY)/2-2
+	x, y := mx/2-6, (my-state.board.dimension*cellScaleY)/2-4
 	win.Move(y, x)
 	win.Printf("GAME OVER")
 	state.waitForExit()
@@ -127,7 +134,7 @@ func (state *viewState) drawWin() {
 	state.draw()
 	win := state.win
 	my, mx := win.MaxYX()
-	x, y := mx/2-4, (my-state.board.dimension*cellScaleY)/2-2
+	x, y := mx/2-4, (my-state.board.dimension*cellScaleY)/2-4
 	win.Move(y, x)
 	win.Printf("YOU WON")
 	state.waitForExit()
