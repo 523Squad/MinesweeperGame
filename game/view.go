@@ -117,6 +117,10 @@ func (state *viewState) draw() {
 	x, y := (mx-width*cellScaleX)/2, (my-height*cellScaleY)/2-2
 	win.Move(y, x)
 	win.Printf("%03d", state.elapsed)
+	// Draw flags left
+	x, y = (mx+width*cellScaleX)/2-5, (my-height*cellScaleY)/2-2
+	win.Move(y, x)
+	win.Printf("%03d", state.board.flagsLeft)
 	win.Refresh()
 }
 
