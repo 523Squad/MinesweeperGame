@@ -7,7 +7,6 @@ import (
 	"time"
 )
 
-
 const EasyLvlDimension = 9
 const EasyLvlBombsNumber = 10
 const MediumLvlDimension = 16
@@ -16,10 +15,10 @@ const HardLvlDimension = 30
 const HardLvlBombsNumber = 116
 
 type point struct {
-	isOpened          bool
-	hasFlag           bool
-	hasMine           bool
-	neighborMineCount int
+	touched     bool
+	isBomb      bool
+	bombsNumber int
+	hasFlag     bool
 }
 
 // Board represents minesweeper board.
@@ -31,7 +30,7 @@ type Board struct {
 }
 
 func (p *point) toString() string {
-	return " " + strconv.FormatBool(p.hasMine) + " neighbours " + strconv.Itoa(p.neighborMineCount)
+	return " " + strconv.FormatBool(p.isBomb) + " neighbours " + strconv.Itoa(p.bombsNumber)
 }
 
 func (b *Board) setBoard(n int) {
@@ -52,8 +51,8 @@ func (b *Board) setBombs() {
 	for count > 0 {
 		x := rand.Intn(b.dimension)
 		y := rand.Intn(b.dimension)
-		if b.field[x][y].hasMine == false {
-			b.field[x][y].hasMine = true
+		if b.field[x][y].isBomb == false {
+			b.field[x][y].isBomb = true
 			count--
 		}
 	}
@@ -69,8 +68,8 @@ func (b *Board) setBombsNeighbours() {
 						continue
 					} else if (((ki + i >= 0) && (ki + i < b.dimension)) &&
 						((kj + j >= 0) && (kj + j < b.dimension))) {
-						if (b.field[ki + i][kj + j].hasMine == true) {
-							b.field[i][j].neighborMineCount++
+						if (b.field[ki + i][kj + j].isBomb == true) {
+							b.field[i][j].bombsNumber++
 						}
 					}
 				}
@@ -86,11 +85,24 @@ func (b *Board) continuePlaying() bool {
 }
 
 func (b *Board) initGame() {
-	b.dimension = EASY_LVL_DIM
-	b.bombsNumber = EASY_LVL_BOMBS
+	b.dimension = EasyLvlDimension
+	b.bombsNumber = EasyLvlBombsNumber
 	b.setBoard(b.dimension)
 	fmt.Println(strconv.FormatBool(b.gameOver))
 
 }
+
+//func main() {
+//	b := Board {dimension:EasyLvlDimension,
+//		   bombsNumber: EasyLvlDimension, }
+//	b.setBoard(b.dimension)
+//	fmt.Println(strconv.FormatBool(b.gameOver))
+//
+//}
+
+
+
+
+
 
 
