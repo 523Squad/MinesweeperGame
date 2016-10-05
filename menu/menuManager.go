@@ -3,21 +3,28 @@ package menu
 import gc "github.com/rthornton128/goncurses"
 
 const (
+	// Height of menu window
 	HEIGHT = 10
-	WIDTH  = 30
+	// Width of menu window
+	WIDTH = 30
+	// Margin of menu window
 	MARGIN = 2
 )
 
-// MenuManager is a struct which manage menu
+// Manager is a struct which manage game menu
 type Manager struct {
 	window *gc.Window
 	y, x   int      // current windows position on terminal
 	titles []string // titles of menu
 	active int      // curent active menu item
+	modes  []string // game modes names
+	mode   int      // current mode
 }
 
+// Game interface which describe game that should run
+// if user choose appropriate option
 type Game interface {
-	Play()
+	Play(int)
 }
 
 // Init standart ncurses screen
@@ -38,7 +45,9 @@ func (m *Manager) init() error {
 
 	my, mx := stdscr.MaxYX()
 
-	m.titles = []string{"Play", "Levels", "Exit"}
+	m.titles = []string{"Play", "Mode: ", "Exit"}
+
+	m.modes = []string{"Easy", "Midd", "Hard"}
 
 	m.y, m.x = (my/2)-(HEIGHT/2), (mx/2)-(WIDTH/2)
 
@@ -51,9 +60,13 @@ func (m *Manager) init() error {
 	return nil
 }
 
+// printMenu() function prints all menu items to window
 func (m *Manager) printMenu() {
 	m.window.Box(0, 0)
 	for i, s := range m.titles {
+		if i == 1 {
+			s = s + m.modes[m.mode]
+		}
 		if i == m.active {
 			m.window.AttrOn(gc.A_REVERSE)
 			m.window.MovePrint(MARGIN+i, MARGIN, s)
@@ -64,6 +77,7 @@ func (m *Manager) printMenu() {
 	}
 }
 
+// Identify menu item which user choose by means of mouse
 func (m *Manager) getActive(my, mx int) int {
 	row := my - m.y - MARGIN
 	col := mx - m.x - MARGIN
@@ -80,8 +94,25 @@ func (m *Manager) getActive(my, mx int) int {
 	return -1
 }
 
+// Handle pressed key
 func (m *Manager) handleInput(key gc.Key) bool {
 	switch key {
+	case gc.KEY_LEFT:
+		if m.active == 1 {
+			if m.mode == 0 {
+				m.mode = len(m.modes) - 1
+			} else {
+				m.mode--
+			}
+		}
+	case gc.KEY_RIGHT:
+		if m.active == 1 {
+			if m.mode == len(m.modes)-1 {
+				m.mode = 0
+			} else {
+				m.mode++
+			}
+		}
 	case gc.KEY_UP:
 		if m.active == 0 {
 			m.active = len(m.titles) - 1
@@ -109,12 +140,14 @@ func (m *Manager) handleInput(key gc.Key) bool {
 	return false
 }
 
+// Refresh screen
 func (m *Manager) refresh() {
 	gc.StdScr().Clear()
 	gc.StdScr().Refresh()
 	m.window.Refresh()
 }
 
+// Run menu and give some choices for user before he begin game
 func (m *Manager) Run(game Game) error {
 	err := m.init()
 
@@ -132,7 +165,7 @@ func (m *Manager) Run(game Game) error {
 		if m.handleInput(key) {
 			switch m.active {
 			case 0:
-				game.Play()
+				game.Play(m.mode)
 			case 2: // exit
 				return nil
 			}
