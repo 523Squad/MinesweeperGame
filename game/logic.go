@@ -65,11 +65,11 @@ func (b *Board) setBombsNeighbours() {
 			coords := []int{-1, 0, 1}
 			for _, ki := range coords {
 				for _, kj := range coords {
-					if (ki == 0 && kj == 0) {
+					if ki == 0 && kj == 0 {
 						continue
-					} else if (((ki + i >= 0) && (ki + i < b.dimension)) &&
-						((kj + j >= 0) && (kj + j < b.dimension))) {
-						if (b.field[ki + i][kj + j].isBomb == true) {
+					} else if ((ki+i >= 0) && (ki+i < b.dimension)) &&
+						((kj+j >= 0) && (kj+j < b.dimension)) {
+						if b.field[ki+i][kj+j].isBomb == true {
 							b.field[i][j].bombsNumber++
 						}
 					}
@@ -91,7 +91,7 @@ func (b *Board) setBombsNeighbours() {
 
 func (b *Board) performRightClick(colCoord int, rowCoord int) {
 	newBoardState := b.field
-	if (newBoardState[colCoord][rowCoord].touched == true) {
+	if newBoardState[colCoord][rowCoord].touched == true {
 	} else {
 		newBoardState[colCoord][rowCoord].hasFlag = true
 	}
@@ -100,9 +100,9 @@ func (b *Board) performRightClick(colCoord int, rowCoord int) {
 
 func (b *Board) performLeftClick(colCoord int, rowCoord int) {
 	newBoardState := b.field
-	if (newBoardState[colCoord][rowCoord].touched == true) {
+	if newBoardState[colCoord][rowCoord].touched == true {
 	} else {
-		if (newBoardState[colCoord][rowCoord].isBomb == true) {
+		if newBoardState[colCoord][rowCoord].isBomb == true {
 			//TODO:make visible all bomb points
 			newBoardState[colCoord][rowCoord].touched = true
 			b.updateState(newBoardState)
@@ -110,10 +110,10 @@ func (b *Board) performLeftClick(colCoord int, rowCoord int) {
 			b.showAllBombs()
 		} else {
 			bombs := newBoardState[colCoord][rowCoord].bombsNumber
-			if (bombs > 0) {
+			if bombs > 0 {
 				newBoardState[colCoord][rowCoord].touched = true
 				b.updateState(newBoardState)
-				if (b.isWin() == true) {
+				if b.isWin() == true {
 					b.gameWin = true
 				}
 			} else {
@@ -122,11 +122,11 @@ func (b *Board) performLeftClick(colCoord int, rowCoord int) {
 				coords := []int{-1, 0, 1}
 				for _, ki := range coords {
 					for _, kj := range coords {
-						if (ki == 0 && kj == 0) {
+						if ki == 0 && kj == 0 {
 							continue
-						} else if (((ki + colCoord >= 0) && (ki + colCoord < b.dimension)) &&
-							((kj + rowCoord >= 0) && (kj + rowCoord < b.dimension))) {
-							b.performLeftClick(ki+colCoord, kj + rowCoord)
+						} else if ((ki+colCoord >= 0) && (ki+colCoord < b.dimension)) &&
+							((kj+rowCoord >= 0) && (kj+rowCoord < b.dimension)) {
+							b.performLeftClick(ki+colCoord, kj+rowCoord)
 						}
 					}
 				}
@@ -136,15 +136,15 @@ func (b *Board) performLeftClick(colCoord int, rowCoord int) {
 	}
 }
 
-func (b *Board) updateState(newBoard [][]*point)  {
+func (b *Board) updateState(newBoard [][]*point) {
 	b.field = newBoard
 }
 
 func (b *Board) isWin() bool {
 	for i := 0; i < b.dimension; i++ {
 		for j := 0; j < b.dimension; j++ {
-			if ((b.field[i][j].isBomb == false) &&
-				(b.field[i][j].touched == false)){
+			if (b.field[i][j].isBomb == false) &&
+				(b.field[i][j].touched == false) {
 				return false
 			}
 		}
@@ -158,14 +158,14 @@ func (b *Board) continuePlaying() bool {
 	return !b.gameOver
 }
 
-func (b* Board) showBoard() {
-	for i := 0; i < b.dimension; i++{
-		for j := 0; j < b.dimension; j++{
-			if (b.field[i][j].touched) {
-				if (b.field[i][j].isBomb) {
+func (b *Board) showBoard() {
+	for i := 0; i < b.dimension; i++ {
+		for j := 0; j < b.dimension; j++ {
+			if b.field[i][j].touched {
+				if b.field[i][j].isBomb {
 					fmt.Print("x" + " ")
 
-				} else  {
+				} else {
 					fmt.Print(strconv.Itoa(b.field[i][j].bombsNumber) + " ")
 
 				}
@@ -178,9 +178,9 @@ func (b* Board) showBoard() {
 }
 
 func (b *Board) showAllBombs() {
-	for i := 0; i < b.dimension; i++{
-		for j := 0; j < b.dimension; j++{
-			if (b.field[i][j].isBomb) {
+	for i := 0; i < b.dimension; i++ {
+		for j := 0; j < b.dimension; j++ {
+			if b.field[i][j].isBomb {
 				b.field[i][j].touched = true
 			}
 		}
@@ -193,6 +193,9 @@ func (b *Board) initGame() {
 	b.setBoard(b.dimension)
 	fmt.Println(strconv.FormatBool(b.gameOver))
 }
+
+func (b *Board) choose(x, y int) {}
+
 //func main() {
 //	b := Board {dimension:EasyLvlDimension,
 //		   bombsNumber: EasyLvlBombsNumber, }

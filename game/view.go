@@ -65,6 +65,7 @@ func initScreen() (*gc.Window, error) {
 	if err != nil {
 		return nil, err
 	}
+	win.Keypad(true)
 	return win, nil
 }
 
@@ -100,28 +101,19 @@ func (state *viewState) draw() {
 }
 
 func (state *viewState) handleKey() bool {
-	p := state.position
 	switch state.win.GetChar() {
-	case 'q':
+	case gc.Key('q'):
 		return true
-	case 'w' | gc.KEY_UP:
-		//		if p.y > 0 {
-		p.y--
-		//		}
-	case 'd' | gc.KEY_RIGHT:
-		//		if p.x < p.width-1 {
-		p.x++
-		//		}
-	case 's' | gc.KEY_DOWN:
-		//		if p.y < p.height-1 {
-		p.y++
-		//		}
-	case gc.KEY_LEFT:
-		//		if p.x > 0 {
-		p.x--
-		//		}
-		// case gc.KEY_ENTER:
-		// 	state.board.choose(state.position.x, state.position.y)
+	case 'w', gc.KEY_UP:
+		state.position.up()
+	case 'd', gc.KEY_RIGHT:
+		state.position.right()
+	case 's', gc.KEY_DOWN:
+		state.position.down()
+	case 'a', gc.KEY_LEFT:
+		state.position.left()
+	case gc.KEY_RETURN, gc.KEY_ENTER, gc.Key('\r'):
+		state.board.choose(state.position.x, state.position.y)
 	}
 	return false
 }
@@ -140,16 +132,13 @@ func (state *viewState) whichColor(value *point, c *coordinate) int16 {
 }
 
 func (state *viewState) whichChar(value *point, c *coordinate) int16 {
-	if state.position.x == c.x && state.position.y == c.y {
-		return '&'
-	}
 	if !value.touched {
-		return '#' // '█'
+		return '#'
 	}
 	if value.isBomb {
-		return 'B' // '💣'
+		return 'B'
 	}
-	return int16(value.bombsNumber /* + '0'*/)
+	return int16(value.bombsNumber)
 }
 
 func (p *coordinate) up() {
