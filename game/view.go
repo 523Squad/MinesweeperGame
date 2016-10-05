@@ -2,11 +2,16 @@ package game
 
 import gc "github.com/rthornton128/goncurses"
 
+const (
+	cellScaleX = 3
+	cellScaleY = 2
+)
+
 // Play starts main part of the game.
-func (g *Board) Play() {
+func (board *Board) Play() {
 	initScreen()
-	g.initGame()
-	play(g)
+	board.initGame()
+	play(board)
 }
 
 func initScreen() {
@@ -20,23 +25,36 @@ func initScreen() {
 	stdscr.Clear()
 }
 
+type gameContract interface {
+	choose(p *point)
+}
+
 func play(board *Board) {
 	stdscr := gc.StdScr()
-	my, mx := stdscr.MaxYX()
 	for board.continuePlaying() {
-		stdscr.Clear()
-		height, width := len(board.field), len(board.field[0])
-		for i, row := range board.field {
-			for j, value := range row {
-				cnum := whichColor(value)
-				stdscr.ColorOn(cnum)
-				x, y := (mx-width)/2+j, (my-height)/2+i
-				stdscr.MovePrint(y, x, whichChar(value))
-				stdscr.ColorOff(cnum)
-			}
-		}
-		stdscr.Refresh()
+		board.handleKey(stdscr)
+		board.draw(stdscr)
 	}
+}
+
+func (board *Board) draw(win *gc.Window) {
+	win.Clear()
+	my, mx := win.MaxYX()
+	height, width := len(board.field), len(board.field[0])
+	for i, row := range board.field {
+		for j, value := range row {
+			cnum := whichColor(value)
+			win.ColorOn(cnum)
+			x, y := (mx-width*cellScaleX)/2+j, (my-height*cellScaleY)/2+i
+			win.MovePrint(y, x, whichChar(value))
+			win.ColorOff(cnum)
+		}
+	}
+	win.Refresh()
+}
+
+func (board *Board) handleKey(win *gc.Window) {
+	// Stub. TODO: Implement
 }
 
 func whichColor(value *point) int16 {
