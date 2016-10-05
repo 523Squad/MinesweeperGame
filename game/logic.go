@@ -91,6 +91,44 @@ func (b *Board) performRightClick(col int, row int) {
 	b.updateState(newBoardState)
 }
 
+func (b *Board) performLeftClick(rowCoord int, colCoord int) {
+	newBoardState := b.field
+	if newBoardState[rowCoord][colCoord].touched == true {
+	} else {
+		if newBoardState[rowCoord][colCoord].isBomb == true {
+			//TODO:make visible all bomb points
+			newBoardState[rowCoord][colCoord].touched = true
+			b.updateState(newBoardState)
+			b.gameOver = true
+			b.showAllBombs()
+		} else {
+			bombs := newBoardState[rowCoord][colCoord].bombsNumber
+			if bombs > 0 {
+				newBoardState[rowCoord][colCoord].touched = true
+				b.updateState(newBoardState)
+				if b.isWin() == true {
+					b.gameWin = true
+				}
+			} else {
+				//empty amount of bomb neighbours
+				newBoardState[rowCoord][colCoord].touched = true
+				coords := []int{-1, 0, 1}
+				for _, ki := range coords {
+					for _, kj := range coords {
+						if ki == 0 && kj == 0 {
+							continue
+						} else if ((ki+rowCoord >= 0) && (ki+rowCoord < b.dimension)) &&
+							((kj+colCoord >= 0) && (kj+colCoord < b.dimension)) {
+							b.performLeftClick(ki+rowCoord, kj+colCoord)
+						}
+					}
+				}
+			}
+		}
+
+	}
+}
+
 func (b *Board) choose(col int, row int) {
 	newBoardState := b.field
 	if newBoardState[row][col].touched == true {

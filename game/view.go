@@ -15,6 +15,7 @@ const (
 
 type gameContract interface {
 	choose(colCoord int, rowCoord int)
+	performLeftClick(coolCord int, rowCoord int)
 }
 
 type coordinate struct {
@@ -162,7 +163,7 @@ func (state *viewState) handleKey() bool {
 	case 'a', gc.KEY_LEFT:
 		state.position.left()
 	case gc.KEY_RETURN, gc.KEY_ENTER, gc.Key('\r'):
-		state.board.choose(state.position.x, state.position.y)
+		state.board.performLeftClick(state.position.y, state.position.x)
 	}
 	return false
 }
