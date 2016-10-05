@@ -14,7 +14,7 @@ const (
 )
 
 type gameContract interface {
-	choose(x, y int)
+	choose(colCoord int, rowCoord int)
 }
 
 type coordinate struct {
@@ -33,7 +33,7 @@ func (board *Board) Play(level int) {
 	if err != nil {
 		panic(err)
 	}
-	board.initGame()
+	board.initGame(level)
 	state := &viewState{
 		board: board,
 		win:   win,

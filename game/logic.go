@@ -7,6 +7,9 @@ import (
 	"time"
 )
 
+const EasyMode = 0
+const MediumMode = 1
+const HardMode = 2
 const EasyLvlDimension = 9
 const EasyLvlBombsNumber = 10
 const MediumLvlDimension = 16
@@ -34,10 +37,10 @@ func (p *point) toString() string {
 	return " " + strconv.FormatBool(p.isBomb) + " neighbours " + strconv.Itoa(p.bombsNumber)
 }
 
-func (b *Board) setBoard(n int) {
-	for i := 0; i < n; i++ {
+func (b *Board) setBoard() {
+	for i := 0; i < b.dimension; i++ {
 		row := []*point{}
-		for j := 0; j < n; j++ {
+		for j := 0; j < b.dimension; j++ {
 			row = append(row, new(point))
 		}
 		b.field = append(b.field, row)
@@ -77,16 +80,6 @@ func (b *Board) setBombsNeighbours() {
 			}
 		}
 	}
-	//for i := 0; i < b.dimension; i++{
-	//	for j := 0; j < b.dimension; j++{
-	//		if (b.field[i][j].isBomb) {
-	//			fmt.Print("*"+" ")
-	//		} else {
-	//			fmt.Print(strconv.Itoa(b.field[i][j].bombsNumber)+" ")
-	//		}
-	//	}
-	//	fmt.Println()
-	//}
 }
 
 func (b *Board) performRightClick(colCoord int, rowCoord int) {
@@ -98,12 +91,11 @@ func (b *Board) performRightClick(colCoord int, rowCoord int) {
 	b.updateState(newBoardState)
 }
 
-func (b *Board) performLeftClick(colCoord int, rowCoord int) {
+func (b *Board) choose(colCoord int, rowCoord int) {
 	newBoardState := b.field
 	if newBoardState[colCoord][rowCoord].touched == true {
 	} else {
 		if newBoardState[colCoord][rowCoord].isBomb == true {
-			//TODO:make visible all bomb points
 			newBoardState[colCoord][rowCoord].touched = true
 			b.updateState(newBoardState)
 			b.gameOver = true
@@ -126,13 +118,12 @@ func (b *Board) performLeftClick(colCoord int, rowCoord int) {
 							continue
 						} else if ((ki+colCoord >= 0) && (ki+colCoord < b.dimension)) &&
 							((kj+rowCoord >= 0) && (kj+rowCoord < b.dimension)) {
-							b.performLeftClick(ki+colCoord, kj+rowCoord)
+							b.choose(ki+colCoord, kj+rowCoord)
 						}
 					}
 				}
 			}
 		}
-
 	}
 }
 
@@ -187,14 +178,25 @@ func (b *Board) showAllBombs() {
 	}
 }
 
-func (b *Board) initGame() {
-	b.dimension = EasyLvlDimension
-	b.bombsNumber = EasyLvlBombsNumber
-	b.setBoard(b.dimension)
+func (b *Board) initGame(mode int) {
+	dimension := -1
+	bombsNumber := -1
+	switch mode {
+	case EasyMode:
+		dimension = EasyLvlDimension
+		bombsNumber = EasyLvlBombsNumber
+	case MediumMode:
+		dimension = MediumLvlDimension
+		bombsNumber = MediumLvlBombsNumber
+	case HardMode:
+		dimension = HardLvlDimension
+		bombsNumber = HardLvlBombsNumber
+	}
+	b.dimension = dimension
+	b.bombsNumber = bombsNumber
+	b.setBoard()
 	fmt.Println(strconv.FormatBool(b.gameOver))
 }
-
-func (b *Board) choose(x, y int) {}
 
 //func main() {
 //	b := Board {dimension:EasyLvlDimension,
