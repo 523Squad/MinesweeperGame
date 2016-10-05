@@ -57,6 +57,7 @@ func initScreen() (*gc.Window, error) {
 	gc.InitPair(3, gc.C_MAGENTA, gc.C_BLACK)
 	gc.InitPair(4, gc.C_GREEN, gc.C_BLACK)
 	gc.InitPair(5, gc.C_BLACK, gc.C_YELLOW)
+	gc.InitPair(6, gc.C_BLACK, gc.C_GREEN)
 
 	stdscr.Clear()
 	my, mx := stdscr.MaxYX()
@@ -138,7 +139,10 @@ func (state *viewState) whichChar(value *point, c *coordinate) int16 {
 	if value.isBomb {
 		return 'B'
 	}
-	return int16(value.bombsNumber)
+	if value.bombsNumber == 0 {
+		return '0'
+	}
+	return int16(value.bombsNumber + '0')
 }
 
 func (p *coordinate) up() {

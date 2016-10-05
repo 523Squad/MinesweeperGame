@@ -82,43 +82,43 @@ func (b *Board) setBombsNeighbours() {
 	}
 }
 
-func (b *Board) performRightClick(colCoord int, rowCoord int) {
+func (b *Board) performRightClick(col int, row int) {
 	newBoardState := b.field
-	if newBoardState[colCoord][rowCoord].touched == true {
+	if newBoardState[row][col].touched == true {
 	} else {
-		newBoardState[colCoord][rowCoord].hasFlag = true
+		newBoardState[row][col].hasFlag = true
 	}
 	b.updateState(newBoardState)
 }
 
-func (b *Board) choose(colCoord int, rowCoord int) {
+func (b *Board) choose(col int, row int) {
 	newBoardState := b.field
-	if newBoardState[colCoord][rowCoord].touched == true {
+	if newBoardState[row][col].touched == true {
 	} else {
-		if newBoardState[colCoord][rowCoord].isBomb == true {
-			newBoardState[colCoord][rowCoord].touched = true
+		if newBoardState[row][col].isBomb == true {
+			newBoardState[row][col].touched = true
 			b.updateState(newBoardState)
 			b.gameOver = true
 			b.showAllBombs()
 		} else {
-			bombs := newBoardState[colCoord][rowCoord].bombsNumber
+			bombs := newBoardState[row][col].bombsNumber
 			if bombs > 0 {
-				newBoardState[colCoord][rowCoord].touched = true
+				newBoardState[row][col].touched = true
 				b.updateState(newBoardState)
 				if b.isWin() == true {
 					b.gameWin = true
 				}
 			} else {
 				//empty amount of bomb neighbours
-				newBoardState[colCoord][rowCoord].touched = true
+				newBoardState[row][col].touched = true
 				coords := []int{-1, 0, 1}
 				for _, ki := range coords {
 					for _, kj := range coords {
 						if ki == 0 && kj == 0 {
 							continue
-						} else if ((ki+colCoord >= 0) && (ki+colCoord < b.dimension)) &&
-							((kj+rowCoord >= 0) && (kj+rowCoord < b.dimension)) {
-							b.choose(ki+colCoord, kj+rowCoord)
+						} else if ((ki+row >= 0) && (ki+row < b.dimension)) &&
+							((kj+col >= 0) && (kj+col < b.dimension)) {
+							b.choose(ki+row, kj+col)
 						}
 					}
 				}
