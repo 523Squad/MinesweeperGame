@@ -234,7 +234,6 @@ func (b *Board) initGame(mode int) {
 	b.bombsNumber = bombsNumber
 	b.flagsLeft = bombsNumber
 	b.setBoard()
-	fmt.Println(strconv.FormatBool(b.gameOver))
 }
 
 func (b *Board) resetGame() {
