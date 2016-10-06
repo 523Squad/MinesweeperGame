@@ -71,8 +71,7 @@ func (b *Board) setBombsNeighbours() {
 				for _, kj := range coords {
 					if ki == 0 && kj == 0 {
 						continue
-					} else if ((ki+i >= 0) && (ki+i < b.dimension)) &&
-						((kj+j >= 0) && (kj+j < b.dimension)) {
+					} else if isCoordValid(ki+i, kj+j, b.dimension) {
 						if b.field[ki+i][kj+j].isBomb == true {
 							b.field[i][j].bombsNumber++
 						}
@@ -95,6 +94,9 @@ func (b *Board) flag(row int, col int) {
 			b.flagsLeft--
 		}
 	}
+	if b.isWin(newBoardState) {
+		b.gameWin = true
+	}
 	b.updateState(newBoardState)
 }
 
@@ -113,10 +115,10 @@ func (b *Board) choose(row int, col int) {
 		} else {
 			bombs := newBoardState[row][col].bombsNumber
 			if bombs > 0 {
-				b.updateState(newBoardState)
-				if b.isWin() {
+				if b.isWin(newBoardState) {
 					b.gameWin = true
 				}
+				b.updateState(newBoardState)
 			} else {
 				coords := []int{-1, 0, 1}
 				for _, ki := range coords {
@@ -144,10 +146,10 @@ func (b *Board) updateState(newBoard [][]*point) {
 	b.field = newBoard
 }
 
-func (b *Board) isWin() bool {
+func (b *Board) isWin(state [][]*point) bool {
 	for i := 0; i < b.dimension; i++ {
 		for j := 0; j < b.dimension; j++ {
-			if !b.field[i][j].isBomb && !b.field[i][j].touched {
+			if !state[i][j].isBomb && !state[i][j].touched {
 				return false
 			}
 		}
@@ -157,7 +159,7 @@ func (b *Board) isWin() bool {
 
 // continuePlaying tells whether we should keep playing.
 func (b *Board) continuePlaying() bool {
-	return !b.gameOver
+	return (!b.gameOver && !b.gameWin)
 }
 
 func (b *Board) showBoard() {
