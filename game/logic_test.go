@@ -140,6 +140,10 @@ func TestIsWin(t *testing.T) {
 	}
 }
 
+func TestBoardChoose(t *testing.T) {
+	// @TODO test
+}
+
 func TestPointToString(t *testing.T) {
 	p := point{true, true, 4, false}
 	s := " true neighbours 4"
