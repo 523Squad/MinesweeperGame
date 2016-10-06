@@ -108,7 +108,7 @@ func TestRightClick(t *testing.T) {
 	initBoard()
 	board.field[0][2].touched = true
 
-	board.performRightClick(0, 2)
+	board.flag(0, 2)
 
 	if board.field[0][2].hasFlag != false {
 		error := fmt.Sprintf("[%d %d] Expected %t, got %t", 0, 2,
@@ -116,7 +116,7 @@ func TestRightClick(t *testing.T) {
 		t.Error(error)
 	}
 
-	board.performRightClick(2, 2)
+	board.flag(2, 2)
 
 	if board.field[2][2].hasFlag != true {
 		error := fmt.Sprintf("[%d %d] Expected %t, got %t", 2, 2,

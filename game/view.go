@@ -65,7 +65,7 @@ func initScreen() (*gc.Window, error) {
 	gc.InitPair(3, gc.C_MAGENTA, gc.C_BLACK)
 	gc.InitPair(4, gc.C_GREEN, gc.C_BLACK)
 	gc.InitPair(5, gc.C_BLACK, gc.C_YELLOW)
-	gc.InitPair(6, gc.C_BLACK, gc.C_GREEN)
+	gc.InitPair(6, gc.C_CYAN, gc.C_BLACK)
 
 	stdscr.Clear()
 	my, mx := stdscr.MaxYX()
@@ -75,6 +75,7 @@ func initScreen() (*gc.Window, error) {
 		return nil, err
 	}
 	win.Keypad(true)
+	// Update every second to approx. timer better.
 	win.Timeout(1000)
 	return win, nil
 }
@@ -166,11 +167,10 @@ func (state *viewState) handleKey() bool {
 		state.position.down()
 	case 'a', gc.KEY_LEFT:
 		state.position.left()
-	//TODO: add code for setting flag on point
-	// case 'f':
-	// 	state.board.performRightClick(state.position.y, state.position.x)
 	case gc.KEY_RETURN, gc.KEY_ENTER, gc.Key('\r'):
-		state.board.performLeftClick(state.position.y, state.position.x)
+		state.board.choose(state.position.y, state.position.x)
+	case 'f', gc.KEY_TAB:
+		state.board.flag(state.position.y, state.position.x)
 	}
 	return false
 }
@@ -179,19 +179,22 @@ func (state *viewState) whichColor(value *point, c *coordinate) int16 {
 	if state.position.x == c.x && state.position.y == c.y {
 		return 5
 	}
+	if value.hasFlag {
+		return 6
+	}
 	if !value.touched {
 		return 2
 	}
 	if value.isBomb {
 		return 3
 	}
-	//TODO: add code for setting flag color
-	// if value.hasFlag {
-	// 	return 3
 	return 4
 }
 
 func (state *viewState) whichChar(value *point, c *coordinate) int16 {
+	if value.hasFlag {
+		return 'F'
+	}
 	if !value.touched {
 		return '#'
 	}
@@ -201,10 +204,6 @@ func (state *viewState) whichChar(value *point, c *coordinate) int16 {
 	if value.bombsNumber == 0 {
 		return '0'
 	}
-	//TODO: add code for setting flag char
-	// if value.hasFlag {
-	// 	return 'F'
-	// }
 	return int16(value.bombsNumber + '0')
 }
 
