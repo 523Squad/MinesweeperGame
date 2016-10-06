@@ -134,15 +134,64 @@ func TestIsWin(t *testing.T) {
 		t.Error(error)
 	}
 
-	board.field[2][1].touched = true // all bombs marked
+	for i := 0; i < board.dimension; i++ {
+		for j := 0; j < board.dimension; j++ {
+			if board.field[i][j].isBomb == false {
+				board.field[i][j].touched = true
+			}
+		}
+	}
+
 	if board.isWin() != true {
 		error := fmt.Sprintf("Expected %t, got %t", true, board.isWin())
 		t.Error(error)
 	}
 }
 
+func TestResetGame(t *testing.T) {
+	initBoard()
+	board.gameWin = true
+
+	board.resetGame()
+	if board.gameWin != false || board.gameOver != false {
+		error := fmt.Sprintf("Expected [%t %t], got [%t %t]",
+			false, false, board.gameWin, board.gameOver)
+		t.Error(error)
+	}
+}
+
 func TestBoardChoose(t *testing.T) {
-	// @TODO test
+	initBoard()
+	board.choose(0, 0)
+
+	if board.gameOver != true {
+		error := fmt.Sprintf("[%d %d]Expected %t, got %t",
+			0, 0, true, board.gameOver)
+		t.Error(error)
+	}
+
+	// Open all bombs after game over
+	for i := 0; i < board.dimension; i++ {
+		for j := 0; j < board.dimension; j++ {
+			if board.field[i][j].isBomb &&
+				board.field[i][j].touched != true {
+				error := fmt.Sprintf("[%d %d]Expected %t, got %t",
+					i, j, true, board.gameOver)
+				t.Error(error)
+			}
+		}
+	}
+}
+
+func TestBoardTouched(t *testing.T) {
+	initBoard()
+	board.choose(0, 1)
+
+	if board.field[0][1].touched != true {
+		error := fmt.Sprintf("[%d %d]Expected %t, got %t",
+			0, 1, true, board.field[0][1].touched)
+		t.Error(error)
+	}
 }
 
 func TestPointToString(t *testing.T) {
