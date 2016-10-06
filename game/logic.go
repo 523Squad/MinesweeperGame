@@ -35,8 +35,7 @@ type Board struct {
 }
 
 func (p *point) toString() string {
-	return  " " + strconv.FormatBool(p.isBomb) 
-			+ " neighbours " + strconv.Itoa(p.bombsNumber)
+	return " " + strconv.FormatBool(p.isBomb) + " neighbours " + strconv.Itoa(p.bombsNumber)
 }
 
 //initialize neccessary params for game : bombs and neighbours
@@ -66,7 +65,7 @@ func (b *Board) setBombs() {
 	}
 }
 
-//definiton dangerous neighbors for each point 
+//definiton dangerous neighbors for each point
 func (b *Board) setBombsNeighbours() {
 	for i := 0; i < b.dimension; i++ {
 		for j := 0; j < b.dimension; j++ {
@@ -128,9 +127,8 @@ func (b *Board) choose(row int, col int) {
 				for i := 0; i < 8; i++ {
 					nextI := neighbours[i][0]
 					nextJ := neighbours[i][1]
-					if (isCoordValid(nextI, nextJ, b.dimension) 
-					    && !newBoardState[nextI][nextJ].hasFlag) {
-							b.choose(nextI, nextJ)
+					if isCoordValid(nextI, nextJ, b.dimension) && !newBoardState[nextI][nextJ].hasFlag {
+						b.choose(nextI, nextJ)
 					}
 				}
 			}
@@ -213,7 +211,7 @@ func (b *Board) showAllBombs() {
 	}
 }
 
-//game start with mode according to menu option selected 
+//game start with mode according to menu option selected
 func (b *Board) initGame(mode int) {
 	dimension := -1
 	bombsNumber := -1
