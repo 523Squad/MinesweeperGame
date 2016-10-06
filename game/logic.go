@@ -35,9 +35,11 @@ type Board struct {
 }
 
 func (p *point) toString() string {
-	return " " + strconv.FormatBool(p.isBomb) + " neighbours " + strconv.Itoa(p.bombsNumber)
+	return  " " + strconv.FormatBool(p.isBomb) 
+			+ " neighbours " + strconv.Itoa(p.bombsNumber)
 }
 
+//initialize neccessary params for game : bombs and neighbours
 func (b *Board) setBoard() {
 	for i := 0; i < b.dimension; i++ {
 		row := []*point{}
@@ -50,6 +52,7 @@ func (b *Board) setBoard() {
 	b.setBombsNeighbours()
 }
 
+//random bombs generations on the board
 func (b *Board) setBombs() {
 	rand.Seed(time.Now().UTC().UnixNano())
 	count := b.bombsNumber
@@ -63,18 +66,17 @@ func (b *Board) setBombs() {
 	}
 }
 
+//definiton dangerous neighbors for each point 
 func (b *Board) setBombsNeighbours() {
 	for i := 0; i < b.dimension; i++ {
 		for j := 0; j < b.dimension; j++ {
-			coords := []int{-1, 0, 1}
-			for _, ki := range coords {
-				for _, kj := range coords {
-					if ki == 0 && kj == 0 {
-						continue
-					} else if isCoordValid(ki+i, kj+j, b.dimension) {
-						if b.field[ki+i][kj+j].isBomb == true {
-							b.field[i][j].bombsNumber++
-						}
+			neighbours := getNeighbours(i, j)
+			for k := 0; k < 8; k++ {
+				nextI := neighbours[k][0]
+				nextJ := neighbours[k][1]
+				if isCoordValid(nextI, nextJ, b.dimension) {
+					if b.field[nextI][nextJ].isBomb == true {
+						b.field[i][j].bombsNumber++
 					}
 				}
 			}
@@ -82,6 +84,7 @@ func (b *Board) setBombsNeighbours() {
 	}
 }
 
+//perform user's  assumption about bomb location
 func (b *Board) flag(row int, col int) {
 	newBoardState := b.field
 	p := newBoardState[row][col]
@@ -100,6 +103,7 @@ func (b *Board) flag(row int, col int) {
 	b.updateState(newBoardState)
 }
 
+//perform point research
 func (b *Board) choose(row int, col int) {
 	newBoardState := b.field
 	p := newBoardState[row][col]
@@ -124,8 +128,9 @@ func (b *Board) choose(row int, col int) {
 				for i := 0; i < 8; i++ {
 					nextI := neighbours[i][0]
 					nextJ := neighbours[i][1]
-					if isCoordValid(nextI, nextJ, b.dimension) && !newBoardState[nextI][nextJ].hasFlag {
-						b.choose(nextI, nextJ)
+					if (isCoordValid(nextI, nextJ, b.dimension) 
+					    && !newBoardState[nextI][nextJ].hasFlag) {
+							b.choose(nextI, nextJ)
 					}
 				}
 			}
@@ -133,12 +138,13 @@ func (b *Board) choose(row int, col int) {
 	}
 }
 
+//avoid IndexOutOfBoundException
 func isCoordValid(i, j, dim int) bool {
 	return i >= 0 && j >= 0 && i < dim && j < dim
 }
 
+//slice of point's neighbors
 func getNeighbours(row int, col int) [][]int {
-
 	neighbours := make([][]int, 8)
 	coords := []int{-1, 0, 1}
 	i := 0
@@ -157,6 +163,7 @@ func getNeighbours(row int, col int) [][]int {
 	return neighbours
 }
 
+//update board field after user action
 func (b *Board) updateState(newBoard [][]*point) {
 	b.field = newBoard
 }
@@ -177,16 +184,15 @@ func (b *Board) continuePlaying() bool {
 	return (!b.gameOver && !b.gameWin)
 }
 
+//helper for demonstrating board state in console mode
 func (b *Board) showBoard() {
 	for i := 0; i < b.dimension; i++ {
 		for j := 0; j < b.dimension; j++ {
 			if b.field[i][j].touched {
 				if b.field[i][j].isBomb {
 					fmt.Print("x" + " ")
-
 				} else {
 					fmt.Print(strconv.Itoa(b.field[i][j].bombsNumber) + " ")
-
 				}
 			} else {
 				fmt.Print("*" + " ")
@@ -196,6 +202,7 @@ func (b *Board) showBoard() {
 	}
 }
 
+//shows bombs location after game over
 func (b *Board) showAllBombs() {
 	for i := 0; i < b.dimension; i++ {
 		for j := 0; j < b.dimension; j++ {
@@ -206,6 +213,7 @@ func (b *Board) showAllBombs() {
 	}
 }
 
+//game start with mode according to menu option selected 
 func (b *Board) initGame(mode int) {
 	dimension := -1
 	bombsNumber := -1
@@ -226,27 +234,9 @@ func (b *Board) initGame(mode int) {
 	b.setBoard()
 }
 
+//reset board params to default for the new game
 func (b *Board) resetGame() {
 	b.field = [][]*point{}
 	b.gameWin = false
 	b.gameOver = false
 }
-
-//func main() {
-//	b := Board {dimension:EasyLvlDimension,
-//		   bombsNumber: EasyLvlBombsNumber, }
-//	b.setBoard(b.dimension)
-//	fmt.Println(strconv.FormatBool(b.gameOver))
-//	b.showBoard()
-//	fmt.Println()
-//	fmt.Println()
-//	count := 0
-//	for b.continuePlaying() {
-//		b.performLeftClick(rand.Intn(b.dimension),rand.Intn(b.dimension))
-//		b.showBoard()
-//		fmt.Println()
-//		fmt.Println()
-//		count++
-//	}
-//	fmt.Println(count)
-//}
