@@ -120,17 +120,12 @@ func (b *Board) choose(row int, col int) {
 				}
 				b.updateState(newBoardState)
 			} else {
-				coords := []int{-1, 0, 1}
-				for _, ki := range coords {
-					for _, kj := range coords {
-						if ki == 0 && kj == 0 {
-							continue
-						} else {
-							nextI, nextJ := ki+row, kj+col
-							if isCoordValid(nextI, nextJ, b.dimension) && !newBoardState[nextI][nextJ].hasFlag {
-								b.choose(nextI, nextJ)
-							}
-						}
+				neighbours := getNeighbours(row, col)
+				for i := 0; i < 8; i++ {
+					nextI := neighbours[i][0]
+					nextJ := neighbours[i][1]
+					if isCoordValid(nextI, nextJ, b.dimension) && !newBoardState[nextI][nextJ].hasFlag {
+						b.choose(nextI, nextJ)
 					}
 				}
 			}
@@ -140,6 +135,26 @@ func (b *Board) choose(row int, col int) {
 
 func isCoordValid(i, j, dim int) bool {
 	return i >= 0 && j >= 0 && i < dim && j < dim
+}
+
+func getNeighbours(row int, col int) [][]int {
+
+	neighbours := make([][]int, 8)
+	coords := []int{-1, 0, 1}
+	i := 0
+	for _, ki := range coords {
+		for _, kj := range coords {
+			if ki == 0 && kj == 0 {
+				continue
+			} else {
+				nextI, nextJ := ki+row, kj+col
+				neighbours[i] = make([]int, 2)
+				neighbours[i][0], neighbours[i][1] = nextI, nextJ
+				i++
+			}
+		}
+	}
+	return neighbours
 }
 
 func (b *Board) updateState(newBoard [][]*point) {
