@@ -24,6 +24,7 @@ func initBoard() {
 	// set bombs
 	board.field[0][0].isBomb = true
 	board.field[2][1].isBomb = true
+	board.flagsLeft = board.bombsNumber
 }
 
 func TestInitGame(t *testing.T) {
