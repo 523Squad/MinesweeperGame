@@ -166,6 +166,9 @@ func (state *viewState) handleKey() bool {
 		state.position.down()
 	case 'a', gc.KEY_LEFT:
 		state.position.left()
+	//TODO: add code for setting flag on point
+	// case 'f':
+	// 	state.board.performRightClick(state.position.y, state.position.x)
 	case gc.KEY_RETURN, gc.KEY_ENTER, gc.Key('\r'):
 		state.board.performLeftClick(state.position.y, state.position.x)
 	}
@@ -182,6 +185,9 @@ func (state *viewState) whichColor(value *point, c *coordinate) int16 {
 	if value.isBomb {
 		return 3
 	}
+	//TODO: add code for setting flag color
+	// if value.hasFlag {
+	// 	return 3
 	return 4
 }
 
@@ -195,6 +201,10 @@ func (state *viewState) whichChar(value *point, c *coordinate) int16 {
 	if value.bombsNumber == 0 {
 		return '0'
 	}
+	//TODO: add code for setting flag char
+	// if value.hasFlag {
+	// 	return 'F'
+	// }
 	return int16(value.bombsNumber + '0')
 }
 
